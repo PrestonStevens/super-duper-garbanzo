@@ -5,59 +5,72 @@ public class App {
 
         Scanner myObj = new Scanner(System.in);
 
-        boolean player1 = true; // this boolean flips between t/f for player 1 and 2
+        int pass_counter = 0; // counter for pass turns
 
-        boolean playing = true; // when playing is true, game plays
+        board game = new board(); // create a new board object
+        
+        while(true) {
+            game.print_board(); // print the board
 
-        // the following creates a start menu for the user to adjust their playing settings
-        System.out.println("Welcome to GO! Please enter the dimensions of your desired board size:");
-        System.out.println("X-Coordinate: ");
-        int X = myObj.nextInt(); // command-line
-        System.out.println("Y-Coordinate: ");
-        int Y = myObj.nextInt(); // command-line
-
-        // 2D array for 9 X 9 go board
-        String[][] Board = new String[Y][X]; // Array is initialized with values set to null
-        // print board as '|' or '-|' using nested for loops
-        while(playing){
-            // Print horizontal grid numberings
-            System.out.println("  0 1 2 3 4 5 6 7 8");
-            for(int i = 0; i < Board.length; i++) {
-                System.out.print(i+" "); // Print vertical grid numberings
-                for(int j = 0; j < Board[i].length; j++) {
-                    if(Board[i][j] == null) {
-                        if(j == 0) {
-                            System.out.print("|");
-                        }
-                        else {
-                            System.out.print("-|");
-                        }
-                    }
-                    else {
-                        System.out.print(Board[i][j]);
-                    }
-                }
-                System.out.println();
+            if (pass_counter == 3) { // if both players pass, end the game
+                System.out.println("Both players passed. Game over.");
+                break; // exit the loop
             }
 
-            // The following while loop asks for a move and checks if it is valid
-            while(true) {
-                System.out.println("Input X Coordinate: ");
-                int moveX = myObj.nextInt(); // command-line 
-                System.out.println("Input Y Coordinate: ");
-                int moveY = myObj.nextInt(); // command-line
+            System.out.println("Pass turn? (y/n): ");
+            String pass = myObj.next(); // get user input for pass turn
 
-                // if the space is empty, the move is played, otherwise a new move is asked for
-                if(Board[moveY][moveX] == null) {
-                // conditional that checks value of player1 and prints either a white or black piece
-                Board[moveY][moveX] = (player1) ? "-o" : "-*"; 
-                break;
-                }
-                else {
-                    System.out.println("Not a valid move");
-                }
+            if(pass.equals("y")) {
+                pass_counter++; // increment pass counter
+                game.player1 = !game.player1; // flip player1 boolean
+                System.out.println("Turn passed.");
+                continue; // skip to the next iteration of the loop
+            } else if (pass.equals("n")) {
+            } else {
+                System.out.println("Invalid input. Please enter 'y' or 'n'.");
+                continue; // skip to the next iteration of the loop
             }
-            player1 = !player1; // next players turn
-        }
+            
+            System.out.println("Enter x and y coordinates to place a piece: ");
+            int x = myObj.nextInt();
+            int y = myObj.nextInt();
+            game.place(x, y); // place a piece on the board
+            game.print_board(); // print the board
+            capture.captureGroup(); // check for captures
+        } 
+        // Test case for the capture method
+        /* 
+        game.place(3, 1); //b
+        game.place(3, 2); //w
+        game.place(4, 1); //b
+        game.place(4, 2); //w
+        game.place(5, 2); //b
+        game.place(5, 1); //w
+        game.place(5, 3); //b
+        game.place(6, 4); //w
+        game.place(3, 4); //b
+        game.place(3, 3); //w
+        game.place(2, 2); //b
+        game.place(4, 3); //w
+        game.place(2, 3); //b
+        game.place(2, 7); //w
+        game.place(0,4); //b
+        game.place(1, 6); //w
+        game.place(1, 4); //b
+        game.place(0, 6); //w
+        game.place(5, 0); //b
+        game.place(2, 8); //w
+        game.place(4, 4); //b
+        capture.captureGroup();
+        game.print_board();
+        */
+        
+        // Calculate territory score for player 1 and player 2
+        score.calculateTerritoryScores();
+        System.out.println("Player 1 Score: " + score.player1_score);
+        System.out.println("Player 2 Score: " + score.player2_score);
+        
+
+        myObj.close();
     }
 }
